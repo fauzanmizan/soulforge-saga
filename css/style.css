@@ -1,0 +1,192 @@
+/*
+ * The Soulforge Saga - Cetakan Agung Visual Terpadu (v7.2)
+ */
+
+/* ============================================= */
+/* == FONDASI & VARIABEL GLOBAL == */
+/* ============================================= */
+:root {
+    --brand-color: #818cf8; /* indigo-400 */
+    --accent-gold: #fde047; /* yellow-300 */
+    --accent-red: #f87171; /* red-400 */
+    --accent-cyan: #67e8f9; /* cyan-300 */
+    --sidebar-bg: #0f172a; /* slate-900 */
+    --content-bg: #1e293b; /* slate-800 */
+    --card-bg: #111827; /* gray-900 */
+    --border-color: #374151; /* gray-700 */
+    --text-primary: #f3f4f6; /* gray-100 */
+    --text-secondary: #9ca3af; /* gray-400 */
+    --text-title: #ffffff;
+    --font-display: 'Cinzel', serif;
+    --font-body: 'Cormorant Garamond', serif;
+}
+html { color-scheme: dark; scroll-behavior: smooth; }
+body { 
+    font-family: var(--font-body);
+    background-color: var(--content-bg);
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.8s ease-in-out;
+}
+.font-serif { font-family: var(--font-display); }
+
+/* ============================================= */
+/* == GERBANG TAKDIR (HALAMAN LOGIN) == */
+/* ============================================= */
+.login-gate-body {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh;
+    overflow: hidden;
+    background-image: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.8) 0%, var(--content-bg) 70%);
+}
+#background-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; }
+.gate-container {
+    position: relative; 
+    z-index: 1; 
+    text-align: center; 
+    padding: 2rem; 
+    max-width: 600px; 
+    width: 100%;
+    animation: fadeInGate 1.5s ease-in-out;
+}
+.mantra-input {
+    font-family: var(--font-body); 
+    font-size: 1.5rem; 
+    background: transparent; 
+    border: none;
+    border-bottom: 2px solid var(--border-color); 
+    color: var(--text-primary); 
+    text-align: center;
+    padding: 0.5rem 1rem; 
+    width: 100%; 
+    transition: all 0.3s ease;
+}
+.mantra-input:focus { outline: none; border-bottom-color: var(--brand-color); }
+.threshold-button {
+    font-family: var(--font-display); 
+    font-size: 1.125rem; 
+    letter-spacing: 0.1em;
+    background: transparent; 
+    border: 2px solid #4b5563; 
+    color: var(--text-secondary);
+    padding: 0.75rem 2rem; 
+    margin-top: 2rem; 
+    cursor: pointer; 
+    transition: all 0.3s ease;
+}
+.threshold-button:hover, .threshold-button:not(:disabled):hover { 
+    border-color: var(--brand-color); color: var(--text-primary); 
+    background-color: rgba(129, 140, 248, 0.1); 
+    box-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
+}
+.threshold-button:disabled { cursor: not-allowed; opacity: 0.5; }
+.error-message { color: var(--accent-red); margin-top: 1rem; height: 1.5rem; transition: opacity 0.3s; }
+
+/* ============================================= */
+/* == STRUKTUR & NAVIGASI UTAMA APLIKASI == */
+/* ============================================= */
+.app-container { display: none; height: 100vh; width: 100vw; }
+.sidebar-link { transition: all 0.2s ease-in-out; }
+.sidebar-link:hover { background-color: var(--card-bg); }
+.sidebar-link.active { 
+    background-color: var(--card-bg); 
+    box-shadow: inset 4px 0 0 0 var(--brand-color); 
+    color: var(--text-title);
+    font-weight: 700;
+}
+
+/* ============================================= */
+/* == KOMPONEN UNIVERSAL == */
+/* ============================================= */
+.loading-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center; flex-direction: column;
+    opacity: 0; transition: opacity 0.3s ease-in-out;
+}
+.loading-screen.visible { display: flex; opacity: 1; }
+.loading-spinner {
+    width: 50px; height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--brand-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+.notification-banner {
+    position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center;
+    padding: 1rem 1.5rem;
+    font-weight: bold; text-align: center; z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-radius: 0.75rem;
+    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.notification-banner.show { top: 20px; }
+.modal-overlay { transition: opacity 0.3s ease-in-out; }
+.modal-content { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+
+/* ============================================= */
+/* == GAYA FITUR SPESIFIK v7.0 == */
+/* ============================================= */
+.scales-beam { width: 100%; height: 4px; background-color: #94a3af; border-radius: 2px; position: relative; transform-origin: center; transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.scales-pan { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -13px; }
+#pan-echo { left: -15px; }
+#pan-intention { right: -15px; }
+.orb { width: 50px; height: 50px; border-radius: 9999px; cursor: pointer; background-color: var(--border-color); border: 2px solid #4b5563; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; position: relative; }
+.orb:hover { transform: scale(1.1); }
+.orb.ignited { background-color: var(--accent-gold); border-color: #facc15; box-shadow: 0 0 20px 4px rgba(253, 224, 71, 0.4); cursor: not-allowed; opacity: 0.6; }
+.orb.disabled { cursor: not-allowed; opacity: 0.4; }
+.orb.active-window::before { content: ''; position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px; border-radius: 50%; border: 2px solid var(--brand-color); animation: pulse-and-spin 4s linear infinite; }
+.attribute-xp-bar { height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
+.attribute-xp-bar-inner { height: 100%; background-color: var(--brand-color); transition: width 0.5s ease; border-radius: 3px; }
+
+.chronicle-entry { position: relative; padding-left: 3rem; margin-bottom: 3rem; }
+.chronicle-entry::before { content: ''; position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background-color: var(--border-color); }
+.chronicle-sigil { position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: var(--sidebar-bg); border-radius: 50%; border: 2px solid var(--border-color); }
+.prophecy-entry .entry-title { color: var(--brand-color); text-shadow: 0 0 8px rgba(129, 140, 248, 0.7); }
+.action-button { background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; }
+.action-button:hover { background-color: var(--brand-color); color: var(--text-title); border-color: var(--brand-color); }
+
+.codex-entry.locked .codex-title { color: var(--text-secondary); opacity: 0.5; cursor: default; }
+.codex-entry.locked .icon-lock { display: inline-block; }
+.codex-entry.unlocked .codex-title { color: var(--text-primary); cursor: pointer; }
+.codex-entry.unlocked .icon-lock { display: none; }
+.codex-entry.unlocked .icon-chevron { display: inline-block !important; transition: transform 0.3s ease; }
+.codex-entry.unlocked .codex-title:hover { color: var(--brand-color); }
+.codex-entry.open .codex-title { color: var(--brand-color); }
+.codex-entry.open .icon-chevron { transform: rotate(90deg); }
+.codex-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, padding 0.5s ease, margin 0.5s ease; margin-left: 1.25rem; padding-left: 1.25rem; border-left: 2px solid var(--border-color);}
+.codex-entry.open .codex-content { max-height: 1000px; /* Cukup besar untuk konten apa pun */ margin-top: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+
+/* ============================================= */
+/* == GAYA ATMOSFER DINAMIS (v7.1+) == */
+/* ============================================= */
+body.resonance-harmonious {
+    --content-bg: #1d2b4f; /* Sedikit lebih biru dan terang */
+}
+.resonance-harmonious #wanderer-app {
+    filter: saturate(1.05);
+}
+body.resonance-discordant {
+    --content-bg: #2f1a24; /* Sedikit lebih merah dan gelap */
+}
+.resonance-discordant #wanderer-app {
+    filter: saturate(0.9) brightness(0.95);
+}
+
+/* ============================================= */
+/* == ANIMASI & EFEK TRANSISI == */
+/* ============================================= */
+@keyframes fadeInGate { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse-and-spin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Soulforge Saga - Dunia Pengembara</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="wanderer">
+    <div id="wanderer-app" class="app-container">
+        <aside class="w-24 lg:w-72 bg-sidebar-bg text-slate-300 flex flex-col shrink-0">
+            <div class="h-24 flex items-center justify-center lg:justify-start lg:pl-8 border-b border-border-color">
+                <div class="p-3 bg-indigo-500 rounded-xl shadow-lg shadow-indigo-500/30"><i data-feather="compass" class="text-white h-8 w-8"></i></div>
+                <div class="hidden lg:block ml-4"><h1 class="text-xl font-bold text-white tracking-widest font-serif">The Soulforge</h1><p class="text-xs text-slate-400 uppercase tracking-widest">Saga</p></div>
+            </div>
+            <nav id="wanderer-nav" class="flex-1 px-4 py-8 space-y-3"></nav>
+        </aside>
+        <main class="flex-1 bg-content-bg overflow-y-auto">
+            <header class="sticky top-0 bg-content-bg/80 backdrop-blur-sm z-10 h-24 flex items-center justify-between px-8 lg:px-12 border-b border-border-color">
+                <div id="wanderer-header-title"><h2 class="text-3xl font-bold text-white font-serif tracking-wider"></h2></div>
+                <div class="flex items-center space-x-5">
+                    <div id="destiny-clock" class="text-right text-sm font-mono text-slate-400"></div>
+                    <div id="wanderer-profile-icon" class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-xl font-bold text-white shadow-lg font-serif"></div>
+                    <button id="logout-button" class="p-2 rounded-md hover:bg-slate-700"><i data-feather="log-out" class="w-5 h-5 text-slate-400"></i></button>
+                </div>
+            </header>
+            <div id="wanderer-page-container" class="p-8 lg:p-12"></div>
+        </main>
+    </div>
+    <div id="notification-banner" class="notification-banner"><i id="notification-icon" data-feather="award" class="w-6 h-6 mr-3"></i><span id="notification-text"></span></div>
+    <div id="overlay-container"></div>
+    <div id="loading-screen" class="loading-screen"><div class="loading-spinner"></div><p id="loading-text" class="mt-6 text-xl text-slate-400"></p></div>
+
+    <template id="template-character">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-card-bg p-8 rounded-2xl shadow-2xl border border-border-color">
+                    <div class="text-center">
+                        <h3 id="wanderer-name-display" class="text-4xl font-serif font-bold text-white tracking-wider"></h3>
+                        <p id="wanderer-title" class="text-lg font-semibold text-indigo-400 mt-2"></p>
+                        <div id="player-status-container" class="mt-2 text-sm font-semibold h-5"></div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-border-color">
+                        <h4 class="text-sm font-bold text-center text-slate-400 uppercase tracking-widest mb-4">The Scales of Conscience</h4>
+                        <div id="wanderer-scales-container"></div>
+                    </div>
+                </div>
+                <div class="bg-card-bg p-8 rounded-2xl shadow-2xl border border-border-color">
+                    <h3 class="text-xl font-serif font-bold text-white mb-2 tracking-wider">The Celestial Altar</h3>
+                    <p class="text-slate-400">Perform the daily Rite of Reckoning.</p>
+                    <div class="relative h-24 mt-8">
+                        <div class="absolute inset-0 border-b-2 border-dashed border-border-color rounded-full"></div>
+                        <div id="wanderer-altar-container" class="absolute inset-0 flex justify-between items-center px-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-3 space-y-8">
+                <div class="bg-card-bg p-6 rounded-2xl shadow-2xl border border-border-color">
+                    <h3 class="text-xl font-serif font-bold text-white mb-4 tracking-wider">Pentagon of Fate</h3>
+                    <div class="w-full max-w-md mx-auto h-64 md:h-80"><canvas id="wanderer-attribute-chart"></canvas></div>
+                </div>
+                 <div class="bg-card-bg p-8 rounded-2xl shadow-2xl border border-border-color">
+                    <h3 class="text-xl font-serif font-bold text-white mb-6 tracking-wider">Divine Mandate</h3>
+                    <div id="wanderer-mandate-container"></div>
+                </div>
+                <div id="attributes-xp-container" class="bg-card-bg p-6 rounded-2xl shadow-2xl border border-border-color">
+                    <h3 class="text-xl font-serif font-bold text-white mb-4 tracking-wider">Soul's Muscle Memory</h3>
+                    <div id="attributes-xp-list" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-quest_log">
+        <div class="bg-card-bg p-8 rounded-2xl shadow-2xl border border-border-color">
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-serif font-bold text-white tracking-wider">The Chronicle of The Soul Weaver</h3>
+                <p class="text-lg text-slate-400 mt-2">A living record of your journey since the First Day.</p>
+            </div>
+            <div id="chronicle-container" class="relative ml-6"></div>
+        </div>
+    </template>
+    
+    <template id="template-chronicle-entry">
+        <div class="chronicle-entry">
+            <div class="chronicle-sigil"><i class="sigil" data-feather="circle"></i></div>
+            <p class="entry-timestamp text-xs text-slate-500 uppercase tracking-widest"></p>
+            <h4 class="entry-title text-2xl font-serif font-bold mt-1"></h4>
+            <p class="entry-reflection mt-2 text-slate-300 leading-relaxed"></p>
+            <div class="entry-actions mt-4"></div>
+        </div>
+    </template>
+    
+    <template id="template-codex">
+        <div class="bg-card-bg p-8 rounded-2xl shadow-2xl border border-border-color">
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-serif font-bold text-white tracking-wider">The Codex</h3>
+                <p class="text-lg text-slate-400 mt-2">Perpustakaan pengetahuan yang terungkap seiring perjalananmu.</p>
+            </div>
+            <div id="codex-chapters-container"></div>
+        </div>
+    </template>
+
+    <template id="template-codex-entry">
+         <div class="codex-entry py-3 border-t border-border-color">
+            <h4 class="codex-title text-xl font-semibold flex items-center justify-between">
+                <span class="flex items-center">
+                    <i data-feather="chevron-right" class="w-5 h-5 mr-3 transition-transform icon-chevron" style="display: none;"></i>
+                    <span class="title-text"></span>
+                </span>
+                <i data-feather="lock" class="w-5 h-5 icon-lock"></i>
+            </h4>
+            <div class="codex-content text-slate-400 mt-2" style="display: none;"></div>
+        </div>
+    </template>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
